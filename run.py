@@ -3,7 +3,7 @@ import sys
 import message
 
 from github_connection import REPO_LIST
-from github_connection import GithubRepo
+from github_connection import GithubConnection
 
 
 def run_crawler():
@@ -17,8 +17,8 @@ def run_crawler():
         print(message.ERROR_EXIT)
         sys.exit(e)
     repo_name = REPO_LIST[repo_num]
-    repo = GithubRepo(name=repo_name)
-    print(repo.issue_list)
+    repo = GithubConnection(name=repo_name)
+    repo.export_csv()
 
 
 if __name__ == '__main__':
