@@ -18,17 +18,10 @@ CSV_ENCODING = 'utf-8'
 
 class GithubConnection:
     def __init__(self, **kwargs):
-        self.user = kwargs.get('user', USER)
-        self.token = kwargs.get('token', TOKEN)
         self.session = requests.Session()
-        self.session.auth = (self.user, self.token)
-
-
-class GithubRepo(GithubConnection):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        self.session.auth = (USER, TOKEN)
         self.name = kwargs.get('name')
-        self.owner = kwargs.get('owner', REPO_OWNER)
+        self.owner = REPO_OWNER
         self._max_page = None
         self._issue_list = []
 
