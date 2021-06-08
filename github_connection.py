@@ -3,11 +3,12 @@ import requests
 import datetime
 import csv
 
+from enum import Enum
+
 
 REPO_OWNER = os.environ.get('OWNER')
 REPO_LIST = ['airklass', 'airklass-ios', 'airklass-android']
-LABEL_LIST = ['bug', 'enhancement', 'in-testing', 'tested', 'unresolved', 'wontfix', 'need-work', 'design',
-              'suggestion']
+
 ISSUE_URL = 'https://api.github.com/repos/{owner}/{repo}/issues?page={page}'
 USER = os.environ.get('USER')
 TOKEN = os.environ.get('TOKEN')
@@ -66,4 +67,52 @@ class GithubConnection:
         export_file = EXPORT_PATH.format(now=now, sort_kind=sort_kind)
         with open(export_file, 'w', newline='', encoding=CSV_ENCODING) as f:
             writer = csv.writer(f)
+class Issue:
+    def __init__(self, **kwargs):
+        url = kwargs.get('url')
+        repository_url = kwargs.get('repository_url')
+        labels_url = kwargs.get('labels_url')
+        comments_url = kwargs.get('comments_url')
+        events_url = kwargs.get('events_url')
+        html_url = kwargs.get('html_url')
+        issue_id = kwargs.get('id')
+        node_id = kwargs.get('node_id')
+        number = kwargs.get('number')
+        title = kwargs.get('title')
+        user = kwargs.get('user').get('login') if kwargs.get('user') else None
+        labels = Issue._parse_labels(kwargs.get('labels'))
+        state = kwargs.get('state')
+        locked = kwargs.get('locked')
+        assignee = kwargs.get('assignee')
+        assignees = Issue._parse_assignee(kwargs.get('assignees'))
+        milestone = kwargs.get('milestone')
+        comments = kwargs.get('comments')
+        created_at = kwargs.get('created_at')
+        updated_at = kwargs.get('updated_at')
+        closed_at = kwargs.get('closed_at')
+
+    @staticmethod
+    def _parse_labels(input_labels):
+        label_list = []
+        for input_label in input_labels:
+            label_name = input_label.get('name')
+            label = Label(label_name)
+            label_list.append(label)
+        return label_list
+
+    @staticmethod
+    def _parse_assignee(input_assignees):
+        return [assignee.login for assignee in input_assignees]
+
+
+class Label(Enum):
+    BUG = 'bug'
+    ENHANCEMENT = 'enhancement'
+    IN_TESTING = 'in-testing'
+    TESTED = 'tested'
+    UNRESOLVED = 'unresolved'
+    WONTFIX = 'wontfix'
+    NEED_WORK = 'need-work'
+    DESIGN = 'design'
+    SUGGESTION = 'suggestion'
 
