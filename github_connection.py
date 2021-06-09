@@ -3,6 +3,8 @@ import requests
 import datetime
 import csv
 
+import message
+
 from enum import Enum
 
 
@@ -26,45 +28,23 @@ class GithubConnection:
         self.session.auth = (USER, TOKEN)
         self.name = kwargs.get('name')
         self.owner = REPO_OWNER
-        self._max_page = None
-        self._issue_list = []
-
-    @property
-    def max_page(self):
-        if self._max_page:
-            return self._max_page
-        self._max_page = self._check_max_page()
-        return self._max_page
-
-    @property
-    def issue_list(self, refresh=False):
-        if self._issue_list and not refresh:
-            return self._issue_list
-        self._issue_list = self._crawling_issue_list()
-        return self._issue_list
-
-    def _check_max_page(self, page=0):
-        step_page = page + 1
-        page_url = ISSUE_URL.format(owner=self.owner, repo=self.name, page=step_page)
-
-        with self.session.get(page_url) as s:
-            if s.status_code != 200:
-                raise GithubConnection.ConnectionError()
-            sources = s.json()
-        if not len(sources):
-            return page
-        return self._check_max_page(page=step_page)
+        self.max_page = None
+        self.issue_list = self._crawling_issue_list()
 
     def _crawling_issue_list(self, crawling_list=None, page=0):
         crawling_list = crawling_list if crawling_list else []
         step_page = page + 1
-        if step_page > self.max_page:
-            return crawling_list
+        print(message.INFO_CRAWLING_LOADING.format(page=step_page))
         page_url = ISSUE_URL.format(owner=self.owner, repo=self.name, page=step_page)
         with self.session.get(page_url) as s:
             if s.status_code != 200:
                 raise GithubConnection.ConnectionError()
-            sources = s.json()
+            source_list = s.json()
+        if not len(source_list):
+            self.max_page = page
+            print(message.INFO_CRAWLING_FINISHED.format(max_page=self.max_page))
+            return crawling_list
+        sources = Issue.generate_issue_list(source_list)
         crawling_list.extend(sources)
         return self._crawling_issue_list(crawling_list=crawling_list, page=step_page)
 
@@ -74,13 +54,15 @@ class GithubConnection:
     class ConnectionError(Exception):
         pass
 
-    def export_csv(self, sort_kind='', sorted_list=None):
-        sorted_list = sorted_list if sorted_list else self._issue_list
-        now = datetime.datetime.now().strftime('%Y_%m_%d%_%H_%M_%S')
+    def export_csv(self, sort_kind='all', sorted_list=None):
+        sorted_list = sorted_list if sorted_list else self.issue_list
+        now = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
         export_file = EXPORT_PATH.format(now=now, sort_kind=sort_kind)
         with open(export_file, 'w', newline='', encoding=CSV_ENCODING) as f:
-            writer = csv.DictWriter(f, fieldnames=COLUMN)
+            writer = csv.DictWriter(f, fieldnames=Issue.get_column_list(choose=True))
             writer.writeheader()
+            for issue in sorted_list:
+                writer.writerow(issue.get_choose_dict())
 
 
 class Issue:
@@ -111,15 +93,53 @@ class Issue:
     @staticmethod
     def _parse_labels(input_labels):
         label_list = []
+        if not input_labels:
+            return label_list
         for input_label in input_labels:
             label_name = input_label.get('name')
-            label = Label(label_name)
+            try:
+                label = Label(label_name)
+            except ValueError as e:
+                print(message.ERROR_LABEL_NOT_FOUND)
+                print(e)
+                continue
             label_list.append(label)
         return label_list
 
     @staticmethod
     def _parse_assignee(input_assignees):
-        return [assignee.login for assignee in input_assignees]
+        if not input_assignees:
+            return []
+        return [assignee.get('login') for assignee in input_assignees]
+
+    @classmethod
+    def generate_issue_list(cls, issue_list):
+        result_list = []
+        for issue_dict in issue_list:
+            issue = cls(**issue_dict)
+            result_list.append(issue)
+        return result_list
+
+    @classmethod
+    def get_column_list(cls, choose=False):
+        if choose:
+            return ['number', 'title', 'labels', 'user', 'assignees', 'html_url', 'created_at', 'closed_at']
+        to_dict = vars(cls())
+        to_keys = to_dict.keys()
+        return list(to_keys)
+
+    def get_choose_dict(self):
+        all_dict = vars(self)
+        result = {}
+        column_list = Issue.get_column_list(choose=True)
+        try:
+            for key in all_dict.keys():
+                if key not in column_list:
+                    continue
+                result[key] = all_dict.get(key)
+        except ValueError as e:
+            print(e)
+        return result
 
 
 class Label(Enum):
@@ -132,4 +152,18 @@ class Label(Enum):
     NEED_WORK = 'need-work'
     DESIGN = 'design'
     SUGGESTION = 'suggestion'
+    QUESTION = 'question'
+    ATTENTION = 'attention'
+    PR = 'PR'
+    INVALID = 'invalid'
+    MERGED = 'merged'
+    SYSTEM_DESIGN = 'system design'
+    UX = 'UX'
+    THIRD_PARTY_ISSUE = '3rd party issue'
+    DATA = 'data'
+    DUPLICATE = 'duplicate'
+    PRIORITY = 'priority'
+
+    def __str__(self):
+        return self.value
 
