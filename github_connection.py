@@ -15,11 +15,14 @@ TOKEN = os.environ.get('TOKEN')
 EXPORT_FILE_NAME = 'issue_list_{now}_{sort_kind}.csv'
 EXPORT_PATH = f'/Users/hyunwoo/Desktop/{EXPORT_FILE_NAME}'
 CSV_ENCODING = 'utf-8'
+COLUMN = ['No.', 'Title', 'Label status', 'github No.', 'URL']
 
 
 class GithubConnection:
     def __init__(self, **kwargs):
         self.session = requests.Session()
+        if not USER or not TOKEN:
+            raise GithubConnection.LoginError()
         self.session.auth = (USER, TOKEN)
         self.name = kwargs.get('name')
         self.owner = REPO_OWNER
@@ -45,6 +48,8 @@ class GithubConnection:
         page_url = ISSUE_URL.format(owner=self.owner, repo=self.name, page=step_page)
 
         with self.session.get(page_url) as s:
+            if s.status_code != 200:
+                raise GithubConnection.ConnectionError()
             sources = s.json()
         if not len(sources):
             return page
@@ -57,16 +62,27 @@ class GithubConnection:
             return crawling_list
         page_url = ISSUE_URL.format(owner=self.owner, repo=self.name, page=step_page)
         with self.session.get(page_url) as s:
+            if s.status_code != 200:
+                raise GithubConnection.ConnectionError()
             sources = s.json()
         crawling_list.extend(sources)
         return self._crawling_issue_list(crawling_list=crawling_list, page=step_page)
+
+    class LoginError(Exception):
+        pass
+
+    class ConnectionError(Exception):
+        pass
 
     def export_csv(self, sort_kind='', sorted_list=None):
         sorted_list = sorted_list if sorted_list else self._issue_list
         now = datetime.datetime.now().strftime('%Y_%m_%d%_%H_%M_%S')
         export_file = EXPORT_PATH.format(now=now, sort_kind=sort_kind)
         with open(export_file, 'w', newline='', encoding=CSV_ENCODING) as f:
-            writer = csv.writer(f)
+            writer = csv.DictWriter(f, fieldnames=COLUMN)
+            writer.writeheader()
+
+
 class Issue:
     def __init__(self, **kwargs):
         self.url = kwargs.get('url')
@@ -79,6 +95,7 @@ class Issue:
         self.node_id = kwargs.get('node_id')
         self.number = kwargs.get('number')
         self.title = kwargs.get('title')
+        # author
         self.user = kwargs.get('user').get('login') if kwargs.get('user') else None
         self.labels = Issue._parse_labels(kwargs.get('labels'))
         self.state = kwargs.get('state')

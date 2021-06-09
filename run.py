@@ -14,11 +14,19 @@ def run_crawler():
     try:
         repo_num = int(input())
     except ValueError as e:
-        print(message.ERROR_EXIT)
+        print(message.ERROR_INPUT_EXIT)
         sys.exit(e)
     repo_name = REPO_LIST[repo_num]
-    repo = GithubConnection(name=repo_name)
-    repo.export_csv()
+    try:
+        repo = GithubConnection(name=repo_name)
+    except GithubConnection.LoginError:
+        print(message.ERROR_LOGIN)
+        sys.exit()
+    try:
+        repo.export_csv()
+    except GithubConnection.ConnectionError:
+        print(message.ERROR_CONNECTION)
+        sys.exit()
 
 
 if __name__ == '__main__':
