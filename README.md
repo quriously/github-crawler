@@ -70,6 +70,16 @@ $ . .env/bin/activate
 
 # 실행
 
+## 프로그래밍 실행
+
 ```commandline
 (.env)$ python run.py
 ```
+
+## 입력
+
+1. csv 파일이 생성될 절대 경로를 입력
+   
+   - ex) `/Users/hyunwoo/Desktop/export`
+
+2. 이슈 목록을 조회할 레파지토리를 목록의 숫자로 선택
