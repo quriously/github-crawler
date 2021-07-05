@@ -7,6 +7,7 @@ from message import INPUT_CHOOSE_REPO
 from message import ERROR_INPUT_EXIT
 from message import ERROR_LOGIN
 from message import ERROR_CONNECTION
+from utils import export_csv
 
 
 def run_crawler():
@@ -26,7 +27,7 @@ def run_crawler():
         print(ERROR_LOGIN)
         sys.exit()
     try:
-        repo.export_csv(path=path)
+        export_csv(issue_list=repo.issue_list, dest_path=path, repo_name=repo_name, extra_name='all')
     except GithubConnection.ConnectionError:
         print(ERROR_CONNECTION)
         sys.exit()

@@ -1,7 +1,5 @@
 import os
 import requests
-import datetime
-import csv
 
 from issue import Issue
 from message import INFO_CRAWLING_LOADING
@@ -51,16 +49,3 @@ class GithubConnection:
 
     class ConnectionError(Exception):
         pass
-
-    def export_csv(self, path='', sort_kind='all', sorted_list=None):
-        if not os.path.exists(path):
-            os.makedirs(path)
-        sorted_list = sorted_list if sorted_list else self.issue_list
-        now = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-        file_name = EXPORT_FILE_NAME.format(now=now, sort_kind=sort_kind)
-        export_file = os.path.join(path, file_name)
-        with open(export_file, 'w', newline='', encoding=CSV_ENCODING) as f:
-            writer = csv.DictWriter(f, fieldnames=Issue.get_column_list(choose=True))
-            writer.writeheader()
-            for issue in sorted_list:
-                writer.writerow(issue.get_choose_dict())
