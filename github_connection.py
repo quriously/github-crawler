@@ -166,6 +166,9 @@ class Label(Enum):
     DATA = 'data'
     DUPLICATE = 'duplicate'
     PRIORITY = 'priority'
+    BACK_END = 'back-end'
+    FRONT_END = 'front-end'
+    APP = 'app'
 
     def __str__(self):
         return self.value
