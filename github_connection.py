@@ -4,11 +4,13 @@ import requests
 from issue import Issue
 from message import INFO_CRAWLING_LOADING
 from message import INFO_CRAWLING_FINISHED
+from milestone import Milestone
 
 REPO_OWNER = os.environ.get('OWNER')
 REPO_LIST = ['airklass', 'airklass-ios', 'airklass-android']
 
 ISSUE_URL = 'https://api.github.com/repos/{owner}/{repo}/issues?page={page}'
+MILESTONE_URL = 'https://api.github.com/repos/{owner}/{repo}/milestones'
 USER = os.environ.get('USER')
 TOKEN = os.environ.get('TOKEN')
 EXPORT_FILE_NAME = 'issue_list_{now}_{sort_kind}.csv'
@@ -26,6 +28,7 @@ class GithubConnection:
         self.owner = REPO_OWNER
         self.max_page = None
         self.issue_list = self._crawling_issue_list()
+        self.milestone_list = self._crawling_milestone_list()
 
     def _crawling_issue_list(self, crawling_list=None, page=0):
         crawling_list = crawling_list if crawling_list else []
@@ -43,6 +46,15 @@ class GithubConnection:
         sources = Issue.generate_issue_list(source_list)
         crawling_list.extend(sources)
         return self._crawling_issue_list(crawling_list=crawling_list, page=step_page)
+
+    def _crawling_milestone_list(self):
+        url = MILESTONE_URL.format(owner=self.owner, repo=self.name)
+        with self.session.get(url) as s:
+            if s.status_code != 200:
+                raise GithubConnection.ConnectionError()
+            source_list = s.json()
+        print(source_list)
+        return Milestone.bulk_generate(source_list)
 
     class LoginError(Exception):
         pass
