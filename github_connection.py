@@ -56,6 +56,16 @@ class GithubConnection:
         print(source_list)
         return Milestone.bulk_generate(source_list)
 
+    def filter_milestone(self, milestone):
+        result_list = []
+        for issue in self.issue_list:
+            if not issue.milestone:
+                continue
+            if issue.milestone.get('title') != milestone.title:
+                continue
+            result_list.append(issue)
+        return result_list
+
     class LoginError(Exception):
         pass
 

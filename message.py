@@ -7,4 +7,5 @@ ERROR_CONNECTION = '통신 응답이 올바르지 않습니다.'
 ERROR_LABEL_NOT_FOUND = '준비되지 않은 라벨을 무시했습니다.'
 INFO_CRAWLING_LOADING = '이슈 목록을 불러오고 있습니다. 현재 페이지 : {page}'
 INFO_CRAWLING_FINISHED = '이슈 목록을 불러왔습니다. 총 페이지 : {max_page}'
+INPUT_CHOOSE_MILESTONE = '출력할 마일스톤을 숫자를 입력해서 선택해주세요. 전체를 대상으로 한다면, -1 을 입력해주세요.'
 
