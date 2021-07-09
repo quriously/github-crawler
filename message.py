@@ -10,3 +10,4 @@ INFO_CRAWLING_FINISHED = '이슈 목록을 불러왔습니다. 총 페이지 : {
 INPUT_CHOOSE_MILESTONE = '출력할 마일스톤을 선택해주세요.'
 INFO_EXIT = '프로그램을 종료합니다.'
 INFO_COMPLETE = '작업을 완료했습니다.'
+INFO_ALREADY_REPO = '준비된 레파지토리입니다.'

@@ -27,10 +27,11 @@ _milestone = {
     'type': 'list',
     'name': 'milestone',
     'message': INPUT_CHOOSE_MILESTONE,
-    'choices': ['all']
+    'choices': []
 }
 
 
 def build_milestone(milestone_list):
-    _milestone['choices'] += milestone_list
+    # initialize and add all
+    _milestone['choices'] = ['all'] + milestone_list
     return _milestone
