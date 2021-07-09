@@ -1,10 +1,10 @@
 import os
 import requests
 
-from issue import Issue
+from models import Issue
+from models import Milestone
 from message import INFO_CRAWLING_LOADING
 from message import INFO_CRAWLING_FINISHED
-from milestone import Milestone
 
 REPO_OWNER = os.environ.get('OWNER')
 REPO_LIST = ['airklass', 'airklass-ios', 'airklass-android']

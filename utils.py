@@ -2,7 +2,7 @@ import os
 import csv
 import datetime
 
-from issue import Issue
+from models import Issue
 
 EXPORT_FILE_NAME = 'issue_list_{now}_{repo_name}_{extra_name}.csv'
 CSV_ENCODING = 'utf-8'
