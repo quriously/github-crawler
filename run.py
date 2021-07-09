@@ -7,6 +7,7 @@ from message import ERROR_LOGIN
 from message import ERROR_CONNECTION
 from message import INFO_COMPLETE
 from message import INFO_EXIT
+from message import INFO_ALREADY_REPO
 from utils import export_csv
 from question import repository
 from question import export_path
@@ -21,6 +22,7 @@ answer_export_path = ''
 def get_repo(repo_name):
     repo = repository_dict.get(repo_name)
     if repo:
+        print(INFO_ALREADY_REPO)
         return repo
     try:
         repo = GithubConnection(name=repo_name)
