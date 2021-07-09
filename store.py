@@ -1,0 +1,6 @@
+REPO_OWNER = None
+USER = None
+TOKEN = None
+
+REPOSITORIES = {}
+EXPORT_PATH = ''

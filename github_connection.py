@@ -13,8 +13,6 @@ ISSUE_URL = 'https://api.github.com/repos/{owner}/{repo}/issues?page={page}'
 MILESTONE_URL = 'https://api.github.com/repos/{owner}/{repo}/milestones'
 USER = os.environ.get('USER')
 TOKEN = os.environ.get('TOKEN')
-EXPORT_FILE_NAME = 'issue_list_{now}_{sort_kind}.csv'
-CSV_ENCODING = 'utf-8'
 COLUMN = ['No.', 'Title', 'Label status', 'github No.', 'URL']
 
 

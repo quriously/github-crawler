@@ -7,6 +7,8 @@ from models import Issue
 EXPORT_FILE_NAME = 'issue_list_{now}_{repo_name}_{extra_name}.csv'
 CSV_ENCODING = 'utf-8'
 
+CONF_PATH = ''
+
 
 def export_csv(issue_list=None, **kwargs):
     dest_path = kwargs.get('dest_path')
@@ -24,3 +26,16 @@ def export_csv(issue_list=None, **kwargs):
         writer.writeheader()
         for issue in issue_list:
             writer.writerow(issue.get_choose_dict())
+
+
+def write_conf():
+    return
+
+
+def read_conf():
+    return
+
+
+def init_conf():
+    read_conf()
+    return

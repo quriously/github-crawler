@@ -3,9 +3,9 @@
 class Milestone:
     def __init__(self, **kwargs):
         self.title = kwargs.get('title')
-        open_issues = kwargs.get('open_issues')
-        closed_issues = kwargs.get('closed_issues')
-        state = kwargs.get('state')
+        self.open_issues = kwargs.get('open_issues')
+        self.closed_issues = kwargs.get('closed_issues')
+        self.state = kwargs.get('state')
 
     @classmethod
     def bulk_generate(cls, creature_list):

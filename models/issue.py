@@ -1,4 +1,4 @@
-from label import Label
+from .label import Label
 from message import ERROR_LABEL_NOT_FOUND
 
 
