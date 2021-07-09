@@ -14,12 +14,17 @@ from question import export_path
 from question import continue_work
 from question import build_milestone
 
-
+# running save
 repository_dict = {}
 answer_export_path = ''
 
 
 def get_repo(repo_name):
+    """
+    When the program starts, the list of repository issues that have been called once is saved and used.
+    :param repo_name:
+    :return:
+    """
     repo = repository_dict.get(repo_name)
     if repo:
         print(INFO_ALREADY_REPO)
