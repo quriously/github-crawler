@@ -53,18 +53,20 @@ class GithubConnection:
             if s.status_code != 200:
                 raise GithubConnection.ConnectionError()
             source_list = s.json()
-        print(source_list)
         return Milestone.bulk_generate(source_list)
 
-    def filter_milestone(self, milestone):
+    def filter_milestone(self, milestone_title):
         result_list = []
         for issue in self.issue_list:
             if not issue.milestone:
                 continue
-            if issue.milestone.get('title') != milestone.title:
+            if issue.milestone.get('title') != milestone_title:
                 continue
             result_list.append(issue)
         return result_list
+
+    def get_milestone_title_list(self):
+        return [m.title for m in self.milestone_list]
 
     class LoginError(Exception):
         pass
