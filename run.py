@@ -41,8 +41,7 @@ def get_repo(repo_name):
 def run_crawler():
     answer_repo = prompt([repository]).get('repo')
     repo = get_repo(answer_repo)
-    question_milestone = build_milestone(repo.get_milestone_title_list())
-    answer_milestone = prompt([question_milestone]).get('milestone')
+    answer_milestone = build_milestone(repo.get_milestone_title_list()).get('milestone')
     export_list = repo.issue_list
     if answer_milestone != 'all':
         export_list = repo.filter_milestone(answer_milestone)
